@@ -3,6 +3,13 @@ import { Node, Edge, getOutgoers, getIncomers } from 'reactflow';
 import { makeAutoObservable } from 'mobx';
 
 import { FlowHandler } from './FlowHandler';
+import { Direction, getLayoutedElements } from '../utils/dagre';
+import {
+  treeNodeWidth,
+  treeNodeHeight,
+  minimizedNodeWidth,
+  minimizedNodeHeight,
+} from '../components/flow/TreeNode';
 
 export class TreeHandler {
   constructor(public flowHandler: FlowHandler) {
@@ -26,6 +33,32 @@ export class TreeHandler {
       outgoers.length +
       outgoers.reduce((acc, child) => acc + this.getDescendantsCount(child), 0)
     );
+  }
+
+  getNodeDimensions = (node: Node) => {
+    const shouldShowMinimized =
+      (node.data?.isMinimized && !node.data?.isFocused) ||
+      (node.data?.depth === 1 && !node.data?.isFocused);
+    return shouldShowMinimized
+      ? { width: minimizedNodeWidth, height: minimizedNodeHeight }
+      : { width: treeNodeWidth, height: treeNodeHeight };
+  };
+
+  updateLayout() {
+    const { nodes: layoutedNodes } = getLayoutedElements(
+      this.flowHandler.nodes,
+      this.flowHandler.edges,
+      Direction.Vertical,
+      this.getNodeDimensions,
+    );
+
+    // Update positions
+    layoutedNodes.forEach((layoutedNode) => {
+      const originalNode = this.flowHandler.nodes.find((n) => n.id === layoutedNode.id);
+      if (originalNode && layoutedNode.position) {
+        originalNode.position = layoutedNode.position;
+      }
+    });
   }
 
   shouldNodeHide(node: Node): boolean {
