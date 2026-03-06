@@ -6,7 +6,7 @@ import { flex1, fullSize } from '../../styles';
 import { observer } from 'mobx-react-lite';
 import { useTreeHandler } from '../../models/TreeHandler';
 
-export const treeNodeWidth = 172;
+export const treeNodeWidth = 170;
 export const treeNodeHeight = 120;
 export const minimizedNodeWidth = 60;
 export const minimizedNodeHeight = 60;
